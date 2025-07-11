@@ -290,4 +290,4 @@ def get_location(ip):
 
 ## 聯絡方式
 
-如有問題，請聯絡：[your-email@example.com](mailto:your-email@example.com)
+如有問題，請聯絡：[myps6415@gmail.com](mailto:myps6415@gmail.com)
