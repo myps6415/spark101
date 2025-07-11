@@ -1,0 +1,82 @@
+{
+  "input_path": "./sample_metrics.json",
+  "output_path": "./monitoring_output",
+  "monitoring_interval": 60,
+  "retention_days": 30,
+  "enable_ml_detection": true,
+  "email_alerts": false,
+  "email_recipients": [
+    "admin@example.com",
+    "devops@example.com"
+  ],
+  "alert_config": {
+    "cpu_threshold": 80.0,
+    "memory_threshold": 85.0,
+    "disk_threshold": 90.0,
+    "network_latency_threshold": 100.0,
+    "error_rate_threshold": 5.0,
+    "response_time_threshold": 1000.0,
+    "request_rate_threshold": 1000
+  },
+  "services": [
+    {
+      "name": "web",
+      "description": "Web 伺服器",
+      "critical": true
+    },
+    {
+      "name": "api",
+      "description": "API 伺服器",
+      "critical": true
+    },
+    {
+      "name": "database",
+      "description": "資料庫伺服器",
+      "critical": true
+    },
+    {
+      "name": "cache",
+      "description": "快取伺服器",
+      "critical": false
+    },
+    {
+      "name": "queue",
+      "description": "訊息佇列",
+      "critical": false
+    },
+    {
+      "name": "worker",
+      "description": "背景工作程式",
+      "critical": false
+    }
+  ],
+  "notification_channels": {
+    "email": {
+      "enabled": false,
+      "smtp_server": "smtp.gmail.com",
+      "smtp_port": 587,
+      "username": "your_email@gmail.com",
+      "password": "your_app_password"
+    },
+    "slack": {
+      "enabled": false,
+      "webhook_url": "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
+    },
+    "webhook": {
+      "enabled": false,
+      "url": "https://your-webhook-endpoint.com/alerts"
+    }
+  },
+  "dashboard": {
+    "enabled": true,
+    "refresh_interval": 30,
+    "charts": [
+      "cpu_usage",
+      "memory_usage",
+      "disk_usage",
+      "network_latency",
+      "error_rate",
+      "response_time"
+    ]
+  }
+}
