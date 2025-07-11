@@ -1,0 +1,11 @@
+name,age,city,salary,department
+Alice,25,Taipei,50000,Engineering
+Bob,30,Taichung,60000,Marketing
+Charlie,35,Kaohsiung,65000,Engineering
+Diana,28,Taipei,55000,HR
+Edward,32,Taichung,58000,Finance
+Fiona,29,Taipei,52000,Marketing
+George,31,Kaohsiung,63000,Engineering
+Helen,27,Taipei,48000,HR
+Ian,33,Taichung,61000,Finance
+Julia,26,Kaohsiung,49000,Marketing
