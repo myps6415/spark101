@@ -3,27 +3,31 @@ pytest 配置文件
 提供共享的測試設置和fixture
 """
 
-import pytest
-import tempfile
-import shutil
 import os
+import shutil
+import tempfile
+
+import pytest
+from pyspark import SparkConf, SparkContext
 from pyspark.sql import SparkSession
-from pyspark import SparkContext, SparkConf
 
 
 @pytest.fixture(scope="session")
 def spark_session():
     """創建測試用的 SparkSession"""
-    spark = SparkSession.builder \
-        .appName("TestSpark") \
-        .master("local[2]") \
-        .config("spark.executor.memory", "1g") \
-        .config("spark.driver.memory", "1g") \
-        .config("spark.sql.warehouse.dir", tempfile.mkdtemp()) \
-        .getOrCreate()
-    
+    os.environ["HADOOP_USER_NAME"] = "spark"
+    os.environ["SPARK_LOCAL_HOSTNAME"] = "localhost"
+    spark = (
+        SparkSession.builder.appName("TestSpark")
+        .master("local[2]")
+        .config("spark.executor.memory", "1g")
+        .config("spark.driver.memory", "1g")
+        .config("spark.sql.warehouse.dir", tempfile.mkdtemp())
+        .config("spark.hadoop.validateOutputSpecs", "false")         .config("spark.driver.extraJavaOptions", "--add-opens=java.base/java.security=ALL-UNNAMED --add-opens=java.base/javax.security.auth=ALL-UNNAMED")         .config("spark.executor.extraJavaOptions", "--add-opens=java.base/java.security=ALL-UNNAMED --add-opens=java.base/javax.security.auth=ALL-UNNAMED")         .getOrCreate()
+    )
+
     yield spark
-    
+
     spark.stop()
 
 
@@ -48,7 +52,7 @@ def sample_data(spark_session):
         ("Alice", 25, "Engineer", 75000),
         ("Bob", 30, "Manager", 85000),
         ("Charlie", 35, "Designer", 65000),
-        ("Diana", 28, "Analyst", 70000)
+        ("Diana", 28, "Analyst", 70000),
     ]
     columns = ["name", "age", "job", "salary"]
     return spark_session.createDataFrame(data, columns)
@@ -67,11 +71,11 @@ def sample_csv_file(temp_dir):
 Alice,25,Taipei,50000
 Bob,30,Taichung,60000
 Charlie,35,Kaohsiung,65000"""
-    
+
     csv_file = os.path.join(temp_dir, "test_data.csv")
-    with open(csv_file, 'w') as f:
+    with open(csv_file, "w") as f:
         f.write(csv_content)
-    
+
     return csv_file
 
 
@@ -81,11 +85,11 @@ def sample_json_file(temp_dir):
     json_content = """{"name": "Alice", "age": 25, "city": "Taipei"}
 {"name": "Bob", "age": 30, "city": "Taichung"}
 {"name": "Charlie", "age": 35, "city": "Kaohsiung"}"""
-    
+
     json_file = os.path.join(temp_dir, "test_data.json")
-    with open(json_file, 'w') as f:
+    with open(json_file, "w") as f:
         f.write(json_content)
-    
+
     return json_file
 
 
