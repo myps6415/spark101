@@ -167,6 +167,72 @@ check-all: lint test validate
 	@echo "✅ 全面檢查完成"
 
 # 幫助
+# Docker 相關命令
+docker-build:
+	@echo "🐳 構建 Docker 映像..."
+	docker build -t spark101:latest .
+
+docker-build-dev:
+	@echo "🐳 構建開發環境 Docker 映像..."
+	docker build -t spark101:dev --target development .
+
+docker-build-prod:
+	@echo "🐳 構建生產環境 Docker 映像..."
+	docker build -t spark101:prod --target production .
+
+docker-up:
+	@echo "🐳 啟動完整 Docker 環境..."
+	docker-compose up -d
+
+docker-up-dev:
+	@echo "🐳 啟動開發 Docker 環境..."
+	docker-compose -f docker-compose.dev.yml up -d
+
+docker-down:
+	@echo "🐳 停止 Docker 環境..."
+	docker-compose down
+
+docker-down-dev:
+	@echo "🐳 停止開發 Docker 環境..."
+	docker-compose -f docker-compose.dev.yml down
+
+docker-logs:
+	@echo "🐳 查看 Docker 日誌..."
+	docker-compose logs -f
+
+docker-logs-dev:
+	@echo "🐳 查看開發 Docker 日誌..."
+	docker-compose -f docker-compose.dev.yml logs -f
+
+docker-shell:
+	@echo "🐳 進入 Docker 容器..."
+	docker-compose exec spark101 bash
+
+docker-shell-dev:
+	@echo "🐳 進入開發 Docker 容器..."
+	docker-compose -f docker-compose.dev.yml exec spark101-dev bash
+
+docker-test:
+	@echo "🐳 在 Docker 中運行測試..."
+	docker-compose exec spark101 python test_spark_setup.py
+
+docker-test-dev:
+	@echo "🐳 在開發 Docker 中運行測試..."
+	docker-compose -f docker-compose.dev.yml exec spark101-dev python test_spark_setup.py
+
+docker-clean:
+	@echo "🐳 清理 Docker 資源..."
+	docker-compose down -v --rmi local --remove-orphans
+	docker system prune -f
+
+docker-restart:
+	@echo "🐳 重啟 Docker 環境..."
+	docker-compose restart
+
+docker-restart-dev:
+	@echo "🐳 重啟開發 Docker 環境..."
+	docker-compose -f docker-compose.dev.yml restart
+
 help:
 	@echo "Spark 101 專案管理命令："
 	@echo ""
@@ -198,6 +264,16 @@ help:
 	@echo "  jupyter        - 啟動 Jupyter Notebook"
 	@echo "  jupyterlab     - 啟動 JupyterLab"
 	@echo "  notebooks      - 轉換腳本為 Notebooks"
+	@echo ""
+	@echo "🐳 Docker："
+	@echo "  docker-build   - 構建 Docker 映像"
+	@echo "  docker-up      - 啟動完整 Docker 環境"
+	@echo "  docker-up-dev  - 啟動開發 Docker 環境"
+	@echo "  docker-down    - 停止 Docker 環境"
+	@echo "  docker-shell   - 進入 Docker 容器"
+	@echo "  docker-test    - 在 Docker 中運行測試"
+	@echo "  docker-logs    - 查看 Docker 日誌"
+	@echo "  docker-clean   - 清理 Docker 資源"
 	@echo ""
 	@echo "🛠️ 開發工具："
 	@echo "  format         - 格式化代碼"

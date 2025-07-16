@@ -1,0 +1,99 @@
+# Prometheus 配置文件
+# 為 Spark101 監控 Spark 應用程序和系統指標
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  # Prometheus 自身監控
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Spark 應用程序監控
+  - job_name: 'spark-driver'
+    static_configs:
+      - targets: ['spark101:4040']
+    metrics_path: '/metrics/json'
+    scrape_interval: 5s
+    scrape_timeout: 10s
+
+  # Spark 執行器監控
+  - job_name: 'spark-executor'
+    static_configs:
+      - targets: ['spark101:4041']
+    metrics_path: '/metrics/json'
+    scrape_interval: 5s
+    scrape_timeout: 10s
+
+  # 系統指標監控
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['spark101:9100']
+    scrape_interval: 15s
+
+  # JVM 指標監控
+  - job_name: 'jvm-metrics'
+    static_configs:
+      - targets: ['spark101:8080']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  # PostgreSQL 監控
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']
+    scrape_interval: 15s
+
+  # Redis 監控
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    scrape_interval: 15s
+
+  # Kafka 監控
+  - job_name: 'kafka'
+    static_configs:
+      - targets: ['kafka:9092']
+    scrape_interval: 15s
+
+  # Minio 監控
+  - job_name: 'minio'
+    static_configs:
+      - targets: ['minio:9000']
+    scrape_interval: 15s
+
+  # 自定義應用程序監控
+  - job_name: 'spark101-app'
+    static_configs:
+      - targets: ['spark101:8888']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+# 告警配置
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# 存儲配置
+storage:
+  tsdb:
+    path: /prometheus
+    retention.time: 15d
+    retention.size: 50GB
+
+# 遠程寫入配置（可選）
+# remote_write:
+#   - url: "http://remote-storage:8080/api/v1/receive"
+
+# 遠程讀取配置（可選）
+# remote_read:
+#   - url: "http://remote-storage:8080/api/v1/read"

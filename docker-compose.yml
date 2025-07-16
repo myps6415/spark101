@@ -1,0 +1,173 @@
+# Spark101 Docker Compose 配置
+# 提供完整的 Spark 學習環境，包含 Jupyter、監控和數據存儲
+
+version: '3.8'
+
+services:
+  # 主要的 Spark101 學習環境
+  spark101:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: spark101-main
+    hostname: spark101
+    ports:
+      - "8888:8888"   # Jupyter Notebook
+      - "4040:4040"   # Spark UI
+      - "4041:4041"   # Spark UI (備用)
+      - "8080:8080"   # Spark Master UI
+      - "8081:8081"   # Spark Worker UI
+    volumes:
+      - ./:/opt/spark101
+      - spark101-data:/opt/spark101/data
+      - spark101-logs:/opt/spark101/logs
+      - spark101-warehouse:/opt/spark101/spark-warehouse
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - JUPYTER_TOKEN=spark101
+      - SPARK_LOCAL_IP=0.0.0.0
+      - SPARK_MASTER_HOST=spark101
+      - SPARK_WORKER_MEMORY=2g
+      - SPARK_WORKER_CORES=2
+    networks:
+      - spark101-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/api"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # PostgreSQL 數據庫（用於高級練習）
+  postgres:
+    image: postgres:15-alpine
+    container_name: spark101-postgres
+    environment:
+      - POSTGRES_DB=spark101
+      - POSTGRES_USER=spark101
+      - POSTGRES_PASSWORD=spark101pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - spark101-network
+    restart: unless-stopped
+
+  # Redis（用於快取和流處理練習）
+  redis:
+    image: redis:7-alpine
+    container_name: spark101-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - spark101-network
+    restart: unless-stopped
+
+  # Apache Kafka（用於流處理練習）
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: spark101-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    networks:
+      - spark101-network
+    restart: unless-stopped
+
+  # Zookeeper（Kafka 依賴）
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: spark101-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+    networks:
+      - spark101-network
+    restart: unless-stopped
+
+  # Minio（S3 相容的對象存儲）
+  minio:
+    image: minio/minio:latest
+    container_name: spark101-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=spark101
+      - MINIO_ROOT_PASSWORD=spark101pass
+    volumes:
+      - minio-data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - spark101-network
+    restart: unless-stopped
+
+  # Prometheus（監控）
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: spark101-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+    networks:
+      - spark101-network
+    restart: unless-stopped
+
+  # Grafana（監控儀表板）
+  grafana:
+    image: grafana/grafana:latest
+    container_name: spark101-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=spark101
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./docker/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+    networks:
+      - spark101-network
+    restart: unless-stopped
+
+volumes:
+  spark101-data:
+  spark101-logs:
+  spark101-warehouse:
+  postgres-data:
+  redis-data:
+  kafka-data:
+  zookeeper-data:
+  minio-data:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  spark101-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

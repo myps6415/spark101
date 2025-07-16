@@ -29,6 +29,12 @@ def test_pyspark():
 
         print(f"✓ PySpark {pyspark.__version__} 安裝成功")
 
+        # 設置 Java 11 環境
+        java_11_path = "/opt/homebrew/opt/openjdk@11/libexec/openjdk.jdk/Contents/Home"
+        if os.path.exists(java_11_path):
+            os.environ["JAVA_HOME"] = java_11_path
+            print(f"✓ 設置 JAVA_HOME 為 Java 11")
+
         # 測試 SparkSession
         from pyspark.sql import SparkSession
 

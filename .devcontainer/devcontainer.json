@@ -1,0 +1,191 @@
+{
+  "name": "Spark101 開發環境",
+  "dockerComposeFile": ["../docker-compose.yml"],
+  "service": "spark101",
+  "workspaceFolder": "/opt/spark101",
+  "shutdownAction": "stopCompose",
+  
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.black-formatter",
+        "ms-python.isort",
+        "ms-python.flake8",
+        "ms-toolsai.jupyter",
+        "ms-toolsai.vscode-jupyter-cell-tags",
+        "ms-toolsai.vscode-jupyter-slideshow",
+        "redhat.vscode-yaml",
+        "ms-vscode.vscode-json",
+        "formulahendry.auto-rename-tag",
+        "bradlc.vscode-tailwindcss",
+        "ms-vscode-remote.remote-containers",
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "eamodio.gitlens",
+        "donjayamanne.githistory",
+        "ms-vscode.wordcount",
+        "yzhang.markdown-all-in-one",
+        "davidanson.vscode-markdownlint",
+        "streetsidesoftware.code-spell-checker",
+        "gruntfuggly.todo-tree",
+        "oderwat.indent-rainbow",
+        "pkief.material-icon-theme",
+        "zhuangtongfa.material-theme",
+        "christian-kohler.path-intellisense",
+        "visualstudioexptteam.vscodeintellicode",
+        "ms-vscode.vscode-typescript-next",
+        "ms-vscode.references-view",
+        "aaron-bond.better-comments",
+        "alefragnani.bookmarks",
+        "formulahendry.code-runner",
+        "ms-python.debugpy"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.linting.enabled": true,
+        "python.linting.pylintEnabled": false,
+        "python.linting.flake8Enabled": true,
+        "python.linting.mypyEnabled": true,
+        "python.formatting.provider": "black",
+        "python.formatting.blackArgs": ["--line-length", "88"],
+        "python.sortImports.args": ["--profile", "black"],
+        "python.testing.pytestEnabled": true,
+        "python.testing.pytestArgs": ["tests"],
+        "python.testing.unittestEnabled": false,
+        "python.testing.nosetestsEnabled": false,
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": true
+        },
+        "files.exclude": {
+          "**/__pycache__": true,
+          "**/*.pyc": true,
+          "**/.pytest_cache": true,
+          "**/.coverage": true,
+          "**/spark-warehouse": true,
+          "**/metastore_db": true,
+          "**/derby.log": true
+        },
+        "jupyter.askForKernelRestart": false,
+        "jupyter.interactiveWindow.textEditor.executeSelection": true,
+        "jupyter.sendSelectionToInteractiveWindow": true,
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "/bin/bash",
+            "args": [],
+            "env": {
+              "JAVA_HOME": "/usr/lib/jvm/java-11-openjdk-amd64",
+              "SPARK_HOME": "/opt/spark101/.venv/lib/python3.11/site-packages/pyspark",
+              "PYTHONPATH": "/opt/spark101",
+              "PYSPARK_PYTHON": "python",
+              "PYSPARK_DRIVER_PYTHON": "python"
+            }
+          }
+        },
+        "workbench.colorTheme": "Material Theme",
+        "workbench.iconTheme": "material-icon-theme",
+        "git.autofetch": true,
+        "git.enableSmartCommit": true,
+        "markdown.preview.fontSize": 14,
+        "markdown.preview.lineHeight": 1.6,
+        "todo-tree.regex.regex": "((//|#|<!--|;|/\\*|^)\\s*($TAGS)|^\\s*- \\[ \\])",
+        "todo-tree.general.tags": ["TODO", "FIXME", "BUG", "HACK", "NOTE", "XXX"],
+        "code-runner.executorMap": {
+          "python": "cd $dir && python $fileName"
+        },
+        "code-runner.runInTerminal": true,
+        "code-runner.saveAllFilesBeforeRun": true
+      }
+    }
+  },
+  
+  "forwardPorts": [4040, 4041, 8080, 8081, 8888, 9090, 3000, 9000, 9001, 5432, 6379, 9092],
+  "portsAttributes": {
+    "4040": {
+      "label": "Spark UI",
+      "onAutoForward": "openPreview"
+    },
+    "4041": {
+      "label": "Spark UI (Secondary)",
+      "onAutoForward": "silent"
+    },
+    "8080": {
+      "label": "Spark Master UI",
+      "onAutoForward": "silent"
+    },
+    "8081": {
+      "label": "Spark Worker UI",
+      "onAutoForward": "silent"
+    },
+    "8888": {
+      "label": "Jupyter Notebook",
+      "onAutoForward": "openPreview"
+    },
+    "9090": {
+      "label": "Prometheus",
+      "onAutoForward": "silent"
+    },
+    "3000": {
+      "label": "Grafana",
+      "onAutoForward": "silent"
+    },
+    "9000": {
+      "label": "Minio",
+      "onAutoForward": "silent"
+    },
+    "9001": {
+      "label": "Minio Console",
+      "onAutoForward": "silent"
+    },
+    "5432": {
+      "label": "PostgreSQL",
+      "onAutoForward": "silent"
+    },
+    "6379": {
+      "label": "Redis",
+      "onAutoForward": "silent"
+    },
+    "9092": {
+      "label": "Kafka",
+      "onAutoForward": "silent"
+    }
+  },
+  
+  "postCreateCommand": "bash -c 'chmod +x docker/start-notebook.sh && chmod +x scripts/*.sh 2>/dev/null || true'",
+  
+  "postStartCommand": "echo '🎉 Spark101 開發環境已準備就緒！'",
+  
+  "mounts": [
+    "source=${localWorkspaceFolder}/data,target=/opt/spark101/data,type=bind,consistency=cached",
+    "source=${localWorkspaceFolder}/logs,target=/opt/spark101/logs,type=bind,consistency=cached"
+  ],
+  
+  "containerEnv": {
+    "JAVA_HOME": "/usr/lib/jvm/java-11-openjdk-amd64",
+    "SPARK_HOME": "/opt/spark101/.venv/lib/python3.11/site-packages/pyspark",
+    "PYTHONPATH": "/opt/spark101",
+    "PYSPARK_PYTHON": "python",
+    "PYSPARK_DRIVER_PYTHON": "python",
+    "JUPYTER_ENABLE_LAB": "yes",
+    "JUPYTER_TOKEN": "spark101"
+  },
+  
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "version": "latest"
+    }
+  },
+  
+  "remoteUser": "root",
+  "updateContentCommand": "pip install --upgrade pip && poetry install --no-interaction --no-ansi",
+  "postAttachCommand": "python test_spark_setup.py"
+}

@@ -1,0 +1,62 @@
+# Grafana 數據源配置
+# 自動配置 Prometheus 和其他數據源
+
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+    jsonData:
+      httpMethod: POST
+      manageAlerts: true
+      prometheusType: Prometheus
+      prometheusVersion: 2.40.0
+      cacheLevel: 'High'
+      disableRecordingRules: false
+      incrementalQueryOverlapWindow: 10m
+
+  - name: PostgreSQL
+    type: postgres
+    url: postgres:5432
+    database: spark101
+    user: spark101
+    password: spark101pass
+    jsonData:
+      sslmode: disable
+      maxOpenConns: 10
+      maxIdleConns: 2
+      connMaxLifetime: 14400
+
+  - name: Redis
+    type: redis-datasource
+    url: redis:6379
+    jsonData:
+      client: standalone
+      poolSize: 5
+      timeout: 10
+      pingInterval: 0
+      pipelineWindow: 0
+
+  - name: Spark101-Logs
+    type: loki
+    url: http://loki:3100
+    jsonData:
+      maxLines: 1000
+      derivedFields:
+        - name: "TraceID"
+          matcherRegex: "trace_id=(\\w+)"
+          url: "http://jaeger:16686/trace/${__value.raw}"
+
+  - name: Spark101-Metrics
+    type: influxdb
+    url: http://influxdb:8086
+    database: spark101
+    user: spark101
+    password: spark101pass
+    jsonData:
+      timeInterval: "10s"
+      httpMode: GET

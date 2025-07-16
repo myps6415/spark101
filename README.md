@@ -107,15 +107,67 @@ pip install -r requirements.txt
 python test_spark_setup.py
 ```
 
-### 方法三：Docker (即開即用)
+### 方法三：Docker (推薦，統一環境)
 
+#### 🐳 完整環境（包含所有服務）
 ```bash
-# 使用預建的 Jupyter+PySpark 環境
-docker run -it --rm \
-  -p 8888:8888 \
-  -v "$(pwd)":/home/jovyan/work \
-  jupyter/pyspark-notebook
+# 1. 克隆專案
+git clone https://github.com/myps6415/spark101.git
+cd spark101
+
+# 2. 啟動完整環境
+docker-compose up -d
+
+# 3. 訪問 Jupyter Notebook
+open http://localhost:8888
+# Token: spark101
 ```
+
+#### 🔧 開發環境（輕量級）
+```bash
+# 啟動開發環境
+docker-compose -f docker-compose.dev.yml up -d
+
+# 查看狀態
+docker-compose -f docker-compose.dev.yml ps
+
+# 進入容器
+docker-compose -f docker-compose.dev.yml exec spark101-dev bash
+```
+
+#### 🛠️ VS Code 開發容器
+```bash
+# 1. 安裝 VS Code 和 Remote-Containers 擴展
+# 2. 在 VS Code 中開啟專案
+# 3. 按 Ctrl+Shift+P，選擇 "Remote-Containers: Reopen in Container"
+# 4. 選擇 "From 'docker-compose.yml'"
+```
+
+#### 🎯 Docker 環境說明
+- **🔥 Spark101 主環境**: Jupyter Notebook + PySpark 3.4.1 + Java 11
+- **🗄️ PostgreSQL**: 用於資料庫相關練習
+- **🔴 Redis**: 用於快取和流處理練習
+- **📊 Kafka**: 用於流處理和訊息佇列練習
+- **💾 Minio**: S3 相容的物件儲存
+- **📈 Prometheus + Grafana**: 監控和視覺化
+- **🖥️ 埠號對應**:
+  - Jupyter Notebook: http://localhost:8888
+  - Spark UI: http://localhost:4040
+  - Grafana: http://localhost:3000
+  - Prometheus: http://localhost:9090
+  - Minio: http://localhost:9000
+
+#### 🚀 一鍵啟動腳本
+```bash
+# 快速啟動開發環境
+chmod +x scripts/setup_java_env.sh
+./scripts/setup_java_env.sh
+
+# 或者使用 Docker
+make docker-up
+```
+
+> 📖 **詳細的 Docker 使用指南**: [DOCKER_GUIDE.md](./DOCKER_GUIDE.md) - 包含完整的 Docker 環境設置、故障排除和最佳實踐
 
 ## 🚀 快速開始
 

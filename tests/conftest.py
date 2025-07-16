@@ -17,13 +17,18 @@ def spark_session():
     """創建測試用的 SparkSession"""
     os.environ["HADOOP_USER_NAME"] = "spark"
     os.environ["SPARK_LOCAL_HOSTNAME"] = "localhost"
+    os.environ["JAVA_HOME"] = "/opt/homebrew/opt/openjdk@11/libexec/openjdk.jdk/Contents/Home"
+    
     spark = (
         SparkSession.builder.appName("TestSpark")
         .master("local[2]")
         .config("spark.executor.memory", "1g")
         .config("spark.driver.memory", "1g")
         .config("spark.sql.warehouse.dir", tempfile.mkdtemp())
-        .config("spark.hadoop.validateOutputSpecs", "false")         .config("spark.driver.extraJavaOptions", "--add-opens=java.base/java.security=ALL-UNNAMED --add-opens=java.base/javax.security.auth=ALL-UNNAMED")         .config("spark.executor.extraJavaOptions", "--add-opens=java.base/java.security=ALL-UNNAMED --add-opens=java.base/javax.security.auth=ALL-UNNAMED")         .getOrCreate()
+        .config("spark.hadoop.validateOutputSpecs", "false")
+        .config("spark.driver.extraJavaOptions", "--add-opens=java.base/java.security=ALL-UNNAMED --add-opens=java.base/javax.security.auth=ALL-UNNAMED")
+        .config("spark.executor.extraJavaOptions", "--add-opens=java.base/java.security=ALL-UNNAMED --add-opens=java.base/javax.security.auth=ALL-UNNAMED")
+        .getOrCreate()
     )
 
     yield spark

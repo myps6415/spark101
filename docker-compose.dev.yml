@@ -1,0 +1,79 @@
+# Docker Compose 開發環境配置
+# 輕量級的開發環境，只包含必要的服務
+
+version: '3.8'
+
+services:
+  # 主要的 Spark101 開發環境
+  spark101-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: spark101-dev
+    hostname: spark101-dev
+    ports:
+      - "8888:8888"   # Jupyter Notebook
+      - "4040:4040"   # Spark UI
+      - "4041:4041"   # Spark UI (備用)
+    volumes:
+      - ./:/opt/spark101
+      - spark101-dev-data:/opt/spark101/data
+      - spark101-dev-logs:/opt/spark101/logs
+      - spark101-dev-warehouse:/opt/spark101/spark-warehouse
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - JUPYTER_TOKEN=spark101
+      - SPARK_LOCAL_IP=0.0.0.0
+      - JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+      - PYTHONPATH=/opt/spark101
+    networks:
+      - spark101-dev-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import pyspark; print('OK')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    stdin_open: true
+    tty: true
+
+  # 輕量級 PostgreSQL（用於資料庫練習）
+  postgres-dev:
+    image: postgres:15-alpine
+    container_name: spark101-postgres-dev
+    environment:
+      - POSTGRES_DB=spark101
+      - POSTGRES_USER=spark101
+      - POSTGRES_PASSWORD=spark101pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - spark101-dev-network
+    restart: unless-stopped
+
+  # Redis（用於快取練習）
+  redis-dev:
+    image: redis:7-alpine
+    container_name: spark101-redis-dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-dev-data:/data
+    networks:
+      - spark101-dev-network
+    restart: unless-stopped
+
+volumes:
+  spark101-dev-data:
+  spark101-dev-logs:
+  spark101-dev-warehouse:
+  postgres-dev-data:
+  redis-dev-data:
+
+networks:
+  spark101-dev-network:
+    driver: bridge

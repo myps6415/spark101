@@ -1,0 +1,136 @@
+# Docker 忽略文件
+# 排除不必要的文件和目錄，提高構建效率
+
+# Git 相關
+.git/
+.gitignore
+.gitattributes
+
+# Python 相關
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+.venv/
+ENV/
+env/
+.env
+
+# IDE 相關
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS 相關
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 測試相關
+.pytest_cache/
+.coverage
+.nyc_output
+htmlcov/
+.tox/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# 文檔相關
+docs/_build/
+site/
+
+# 臨時文件
+tmp/
+temp/
+*.tmp
+*.temp
+*.log
+*.bak
+*.swp
+*.swo
+
+# Spark 相關
+spark-warehouse/
+metastore_db/
+derby.log
+*.parquet
+*.orc
+
+# 大文件和數據
+*.zip
+*.tar.gz
+*.tgz
+*.tar
+*.rar
+*.7z
+data/
+datasets/large/
+logs/
+*.csv
+*.json
+*.xml
+*.avro
+
+# Docker 相關
+Dockerfile.dev
+docker-compose.override.yml
+docker-compose.local.yml
+
+# 安全相關
+.env.local
+.env.*.local
+*.pem
+*.key
+*.crt
+secrets/
+
+# 輸出文件
+output/
+results/
+reports/
+
+# 緩存
+.cache/
+.parcel-cache/
+.npm/
+.yarn/
+node_modules/
+
+# IDE 配置
+.vscode/settings.json
+.idea/workspace.xml
+.idea/tasks.xml
